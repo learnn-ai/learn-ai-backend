@@ -1,6 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.CognitiveServices.Speech;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,16 +10,26 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace gene_pool_backend {
-  public static class BlobStorageHelper {
-    private static string connectionString = "DefaultEndpointsProtocol=https;AccountName=genepoolstorage;AccountKey=gYC3jnsvdZCSxQJH4hTn2kpy9SyDW5bpfB5KIjB7D0SPMu0GG7y/mlrJNFrAGi56kadHW+VDwsxoYKvb3eaCAw==;EndpointSuffix=core.windows.net";
+  public class BlobStorageHelper {
     private static string containerName = "genepoolcontainer";
+    public static BlobStorageHelper Instance { get; set; }
 
-    private static BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+    public static void Init(IConfiguration configuration) {
+      Instance = new BlobStorageHelper(configuration);
+    }
 
-    private static string mp4file;
-    private static string wavfile;
+    private BlobStorageHelper(IConfiguration configuration) {
+      string connectionString = configuration["StorageBlob"];
+      Console.WriteLine(connectionString);
+      blobServiceClient = new BlobServiceClient(connectionString);
+    }
 
-    public static async Task UploadLinkToBlobAsync(string url) {
+    private BlobServiceClient blobServiceClient;
+
+    private string mp4file;
+    private string wavfile;
+
+    public async Task UploadLinkToBlobAsync(string url) {
       var folder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
       mp4file = Path.Combine(folder, "hello.mp4");
       wavfile = Path.Combine(folder, "hello.wav");
@@ -60,7 +71,7 @@ namespace gene_pool_backend {
       File.Delete(wavfile);
     }
 
-    public static async Task UploadFileToBlobAsync(Microsoft.AspNetCore.Http.IFormFile file) {
+    public async Task UploadFileToBlobAsync(Microsoft.AspNetCore.Http.IFormFile file) {
 
       // Create the container and return a container client object
       BlobContainerClient containerClient;
@@ -83,7 +94,7 @@ namespace gene_pool_backend {
       }
     }
 
-    public static async Task<string> TranscribeBlobAsync() {
+    public async Task<string> TranscribeBlobAsync() {
       // Create the container and return a container client object
       BlobContainerClient containerClient;
       try {
