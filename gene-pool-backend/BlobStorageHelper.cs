@@ -30,7 +30,7 @@ namespace gene_pool_backend {
     private string wavfile;
     private string wavname;
 
-    public async Task<int> UploadLinkToBlobAsync(string url) {
+    public async Task<dynamic> UploadLinkToBlobAsync(string url) {
       try {
         string mp4filename = Guid.NewGuid().ToString();
         string wavfilename = Guid.NewGuid().ToString();
