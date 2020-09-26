@@ -126,9 +126,18 @@ namespace gene_pool_backend.Controllers {
     [HttpPost]
     [Route("transcribe_link")]
     public async Task<IActionResult> LinkToWav([FromForm] MyFile files) {
-      await BlobStorageHelper.Instance.UploadLinkToBlobAsync("https://www.youtube.com/watch?v=tpIctyqH29Q");
-      string res = await BlobStorageHelper.Instance.TranscribeBlobAsync();
-      return Ok(res);
+      try {
+        await BlobStorageHelper.Instance.UploadLinkToBlobAsync("https://www.youtube.com/watch?v=tpIctyqH29Q");
+      } catch {
+        return BadRequest("Error during upload");
+      }
+
+      try {
+        string res = await BlobStorageHelper.Instance.TranscribeBlobAsync();
+        return Ok(res);
+      } catch {
+        return BadRequest("Error during transcription");
+      }
     }
   }
 }

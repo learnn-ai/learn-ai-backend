@@ -14,7 +14,7 @@ namespace gene_pool_backend {
   public static class FileHelper {
     private static string PathToFfmpeg = "ffmpeg.exe";
 
-    public static void ToWavFormat(string pathToMp4, string pathToWav) {
+    public static bool ToWavFormat(string pathToMp4, string pathToWav) {
       System.Diagnostics.Trace.TraceInformation("TESTINGTESTINGTESTING");
 
       var ffmpeg = new Process {
@@ -31,7 +31,7 @@ namespace gene_pool_backend {
       try {
         if (!ffmpeg.Start()) {
           Console.WriteLine("Error starting");
-          return;
+          return false;
         }
         var reader = ffmpeg.StandardError;
         string line;
@@ -40,10 +40,12 @@ namespace gene_pool_backend {
         }
       } catch (Exception exception) {
         Console.WriteLine(exception.ToString());
-        return;
+        return false;
       }
 
       ffmpeg.Close();
+
+      return true;
     }
 
     public static void SaveVideoToDisk(string link, string fileName) {
