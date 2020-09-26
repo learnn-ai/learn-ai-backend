@@ -28,12 +28,14 @@ namespace gene_pool_backend {
 
     private string mp4file;
     private string wavfile;
+    private string wavname;
 
-    public async Task<bool> UploadLinkToBlobAsync(string url) {
+    public async Task<bool> UploadLinkToBlobAsync(string url, string title) {
       try {
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-        mp4file = Path.Combine(folder, "hello.mp4");
-        wavfile = Path.Combine(folder, "hello.wav");
+        mp4file = Path.Combine(folder, $"{title}.mp4");
+        wavfile = Path.Combine(folder, $"{title}.wav");
+        wavname = $"{title}.wav";
 
         try {
           File.Delete(mp4file);
@@ -60,7 +62,7 @@ namespace gene_pool_backend {
         try {
           Debug.WriteLine("I got here 2");
 
-          string fileName = $"hello.wav";
+          string fileName = wavname;
 
           // Get a reference to a blob
           BlobClient blobClient = containerClient.GetBlobClient(fileName);
@@ -119,7 +121,9 @@ namespace gene_pool_backend {
         containerClient = blobServiceClient.GetBlobContainerClient(containerName);
       }
 
-      BlobClient blobClient = containerClient.GetBlobClient($"hello.wav");
+      Console.WriteLine($"Transcribing {wavname}");
+
+      BlobClient blobClient = containerClient.GetBlobClient(wavname);
       BlobDownloadInfo download = await blobClient.DownloadAsync();
 
       return await TranscriberHelper.TranscribeBinaryReader(new BinaryReader(download.Content));

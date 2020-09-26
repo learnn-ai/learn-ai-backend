@@ -99,7 +99,11 @@ namespace gene_pool_backend.Controllers {
       var body = JsonConvert.DeserializeObject<dynamic>(request.ToString());
 
       try {
-        await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString());
+        var youTube = YouTube.Default;
+        var video = youTube.GetVideo(body.url.ToString());
+        string title = video.Title;
+
+        await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString(), title);
       } catch {
         return BadRequest("Error during upload");
       }
