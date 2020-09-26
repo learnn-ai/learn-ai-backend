@@ -15,7 +15,7 @@ namespace gene_pool_backend {
 
       StringBuilder sb = new StringBuilder();
 
-      using (var audioInput = Utility.OpenWavFile(reader)) {
+      using (var audioInput = WavHelper.OpenWavFile(reader)) {
         using (var recognizer = new SpeechRecognizer(config, audioInput)) {
           recognizer.Recognized += (s, e) => {
             if (e.Result.Reason == ResultReason.RecognizedSpeech) {
