@@ -46,8 +46,10 @@ namespace gene_pool_backend {
         Debug.WriteLine("I got here 1");
 
         FileHelper.SaveVideoToDisk(url, mp4file);
-        if (!FileHelper.ToWavFormat(mp4file, wavfile)) {
-          return 2;
+        int res = FileHelper.ToWavFormat(mp4file, wavfile);
+
+        if (res != 0) {
+          return res;
         }
 
         // Create the container and return a container client object
