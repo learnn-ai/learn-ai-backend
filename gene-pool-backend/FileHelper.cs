@@ -14,9 +14,7 @@ namespace gene_pool_backend {
   public static class FileHelper {
     private static string PathToFfmpeg = "ffmpeg.exe";
 
-    public static bool ToWavFormat(string pathToMp4, string pathToWav) {
-      System.Diagnostics.Trace.TraceInformation("TESTINGTESTINGTESTING");
-
+    public static int ToWavFormat(string pathToMp4, string pathToWav) {
       var ffmpeg = new Process {
         StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = PathToFfmpeg }
       };
@@ -31,7 +29,7 @@ namespace gene_pool_backend {
       try {
         if (!ffmpeg.Start()) {
           Console.WriteLine("Error starting");
-          return false;
+          return -1;
         }
         var reader = ffmpeg.StandardError;
         string line;
@@ -40,18 +38,24 @@ namespace gene_pool_backend {
         }
       } catch (Exception exception) {
         Console.WriteLine(exception.ToString());
-        return false;
+        return -2;
       }
 
       ffmpeg.Close();
 
-      return true;
+      return 0;
     }
 
-    public static void SaveVideoToDisk(string link, string fileName) {
-      var youTube = YouTube.Default; // starting point for YouTube actions
-      var video = youTube.GetVideo(link); // gets a Video object with info about the video
-      File.WriteAllBytes(fileName, video.GetBytes());
+    public static bool SaveVideoToDisk(string link, string fileName) {
+      try {
+        var youTube = YouTube.Default; // starting point for YouTube actions
+        var video = youTube.GetVideo(link); // gets a Video object with info about the video
+        File.WriteAllBytes(fileName, video.GetBytes());
+
+        return true;
+      } catch {
+        return false;
+      }
     }
   }
 
