@@ -92,10 +92,7 @@ namespace gene_pool_backend.Controllers {
       return Ok();
     }
 
-    string connectionString = "DefaultEndpointsProtocol=https;AccountName=genepoolstorage;AccountKey=gYC3jnsvdZCSxQJH4hTn2kpy9SyDW5bpfB5KIjB7D0SPMu0GG7y/mlrJNFrAGi56kadHW+VDwsxoYKvb3eaCAw==;EndpointSuffix=core.windows.net";
-    string containerName = "genepoolcontainer";
-    string blobFileName = "helloworld";
-
+    /*
     [HttpPost]
     [Route("upload_file")]
     public async Task<IActionResult> UploadFile ([FromForm] MyFile files) {
@@ -124,90 +121,14 @@ namespace gene_pool_backend.Controllers {
 
       return Ok();
     }
+    */
 
     [HttpPost]
-    [Route("link_to_wav")]
+    [Route("transcribe_link")]
     public async Task<IActionResult> LinkToWav([FromForm] MyFile files) {
-      FileHelpers.SaveVideoToDisk("https://www.youtube.com/watch?v=tpIctyqH29Q");
-      FileHelpers.ToWavFormat("hello.mp4", "hello.wav");
-
-      return Ok();
-    }
-
-     [HttpPost]
-    [Route("blob_to_text")]
-    public async Task<IActionResult> BlobToText([FromForm] MyFile files) {
-      var config = SpeechConfig.FromSubscription("0afaff0095f946eaa101f44563f3c341", "eastus2");
-
-      var stopRecognition = new TaskCompletionSource<int>();
-
-      // Create a BlobServiceClient object which will be used to create a container client
-      BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-
-      // Create the container and return a container client object
-      BlobContainerClient containerClient;
-      try {
-        containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
-      } catch {
-        containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-      }
-
-      BlobClient blobClient = containerClient.GetBlobClient($"{blobFileName}.wav");
-      BlobDownloadInfo download = await blobClient.DownloadAsync();
-
-      // Create an audio stream from a wav file.
-      // Replace with your own audio file name.
-      using (var audioInput = Utility.OpenWavFile(new BinaryReader(download.Content))) {
-        // Creates a speech recognizer using audio stream input.
-        using (var recognizer = new SpeechRecognizer(config, audioInput)) {
-          // Subscribes to events.
-          recognizer.Recognizing += (s, e) => {
-            Console.WriteLine($"RECOGNIZING: Text={e.Result.Text}");
-          };
-
-          recognizer.Recognized += (s, e) => {
-            if (e.Result.Reason == ResultReason.RecognizedSpeech) {
-              Console.WriteLine($"RECOGNIZED: Text={e.Result.Text}");
-            } else if (e.Result.Reason == ResultReason.NoMatch) {
-              Console.WriteLine($"NOMATCH: Speech could not be recognized.");
-            }
-          };
-
-          recognizer.Canceled += (s, e) => {
-            Console.WriteLine($"CANCELED: Reason={e.Reason}");
-
-            if (e.Reason == CancellationReason.Error) {
-              Console.WriteLine($"CANCELED: ErrorCode={e.ErrorCode}");
-              Console.WriteLine($"CANCELED: ErrorDetails={e.ErrorDetails}");
-              Console.WriteLine($"CANCELED: Did you update the subscription info?");
-            }
-
-            stopRecognition.TrySetResult(0);
-          };
-
-          recognizer.SessionStarted += (s, e) => {
-            Console.WriteLine("\nSession started event.");
-          };
-
-          recognizer.SessionStopped += (s, e) => {
-            Console.WriteLine("\nSession stopped event.");
-            Console.WriteLine("\nStop recognition.");
-            stopRecognition.TrySetResult(0);
-          };
-
-          // Starts continuous recognition. Uses StopContinuousRecognitionAsync() to stop recognition.
-          await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
-
-          // Waits for completion.
-          // Use Task.WaitAny to keep the task rooted.
-          Task.WaitAny(new[] { stopRecognition.Task });
-
-          // Stops recognition.
-          await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
-        }
-      }
-
-      return Ok();
+      await BlobStorageHelper.UploadLinkToBlobAsync("https://www.youtube.com/watch?v=tpIctyqH29Q");
+      string res = await BlobStorageHelper.TranscribeBlobAsync();
+      return Ok(res);
     }
   }
 }
