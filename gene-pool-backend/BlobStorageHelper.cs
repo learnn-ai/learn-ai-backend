@@ -113,9 +113,10 @@ namespace gene_pool_backend {
 
       Console.WriteLine($"Transcribing {wavname}");
 
+      BlobDownloadInfo download;
       try {
         BlobClient blobClient = containerClient.GetBlobClient(wavname);
-        BlobDownloadInfo download = await blobClient.DownloadAsync();
+        download = await blobClient.DownloadAsync();
       } catch {
         return new string[1];
       }
