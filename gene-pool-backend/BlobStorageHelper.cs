@@ -102,7 +102,7 @@ namespace gene_pool_backend {
       }
     }
 
-    public async Task<string> TranscribeBlobAsync() {
+    public async Task<string[]> TranscribeBlobAsync() {
       // Create the container and return a container client object
       BlobContainerClient containerClient;
       try {
@@ -113,8 +113,13 @@ namespace gene_pool_backend {
 
       Console.WriteLine($"Transcribing {wavname}");
 
-      BlobClient blobClient = containerClient.GetBlobClient(wavname);
-      BlobDownloadInfo download = await blobClient.DownloadAsync();
+      try {
+        BlobClient blobClient = containerClient.GetBlobClient(wavname);
+        BlobDownloadInfo download = await blobClient.DownloadAsync();
+      } catch {
+        return new string[1];
+      }
+
 
       return await TranscriberHelper.TranscribeBinaryReader(new BinaryReader(download.Content));
     }

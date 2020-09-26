@@ -1,6 +1,7 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace gene_pool_backend {
   public static class TranscriberHelper {
-    public static async Task<string> TranscribeBinaryReader(BinaryReader reader) {
+    public static async Task<string[]> TranscribeBinaryReader(BinaryReader reader) {
       var config = SpeechConfig.FromSubscription("0afaff0095f946eaa101f44563f3c341", "eastus2");
 
       var stopRecognition = new TaskCompletionSource<int>();
 
       StringBuilder sb = new StringBuilder();
+      string log;
+      StringBuilder logs = new StringBuilder();
 
       using (var audioInput = WavHelper.OpenWavFile(reader)) {
         using (var recognizer = new SpeechRecognizer(config, audioInput)) {
@@ -22,29 +25,31 @@ namespace gene_pool_backend {
               Console.WriteLine($"RECOGNIZED: Text={e.Result.Text}");
               sb.Append(e.Result.Text);
             } else if (e.Result.Reason == ResultReason.NoMatch) {
-              Console.WriteLine($"NOMATCH: Speech could not be recognized.");
+              log = $"NOMATCH: Speech could not be recognized.";
+              logs.Append(log);
             }
           };
 
           recognizer.Canceled += (s, e) => {
-            Console.WriteLine($"CANCELED: Reason={e.Reason}");
+            log = $"CANCELED: Reason={e.Reason}";
+            logs.Append(log);
 
             if (e.Reason == CancellationReason.Error) {
-              Console.WriteLine($"CANCELED: ErrorCode={e.ErrorCode}");
-              Console.WriteLine($"CANCELED: ErrorDetails={e.ErrorDetails}");
-              Console.WriteLine($"CANCELED: Did you update the subscription info?");
+              log = $"CANCELED: ErrorCode={e.ErrorCode}\nCANCELED: ErrorDetails={e.ErrorDetails}\nCANCELED: Did you update the subscription info?";
+              logs.Append(log);
             }
 
             stopRecognition.TrySetResult(0);
           };
 
           recognizer.SessionStarted += (s, e) => {
-            Console.WriteLine("\nSession started event.");
+            log = "\nSession started event.";
+            logs.Append(log);
           };
 
           recognizer.SessionStopped += (s, e) => {
-            Console.WriteLine("\nSession stopped event.");
-            Console.WriteLine("\nStop recognition.");
+            log = "\nSession stopped event.\nStop recognition.";
+            logs.Append(log);
             stopRecognition.TrySetResult(0);
           };
 
@@ -56,7 +61,11 @@ namespace gene_pool_backend {
         }
       }
 
-      return sb.ToString();
+      string[] res = new string[2];
+      res[0] = sb.ToString();
+      res[1] = logs.ToString();
+
+      return res;
     }
   }
 }

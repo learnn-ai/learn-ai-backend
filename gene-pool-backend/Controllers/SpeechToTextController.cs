@@ -103,16 +103,22 @@ namespace gene_pool_backend.Controllers {
         var video = youTube.GetVideo(body.url.ToString());
         string title = video.Title;
 
-        await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString(), title);
+        bool res = await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString(), title);
+        if (!res) {
+          return BadRequest("Error during upload");
+        }
       } catch {
         return BadRequest("Error during upload");
       }
 
       try {
-        string res = await BlobStorageHelper.Instance.TranscribeBlobAsync();
+        string[] res = await BlobStorageHelper.Instance.TranscribeBlobAsync();
+        if (res.Length == 1) {
+          return BadRequest("Error with reading file");
+        }
         return Ok(res);
       } catch {
-        return BadRequest("Error during transcription");
+        return BadRequest("Unknown error during transcription");
       }
     }
   }
