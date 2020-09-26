@@ -30,12 +30,15 @@ namespace gene_pool_backend {
     private string wavfile;
     private string wavname;
 
-    public async Task<bool> UploadLinkToBlobAsync(string url, string title) {
+    public async Task<bool> UploadLinkToBlobAsync(string url) {
       try {
+        string mp4filename = Guid.NewGuid().ToString();
+        string wavfilename = Guid.NewGuid().ToString();
+
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-        mp4file = Path.Combine(folder, $"{title}.mp4");
-        wavfile = Path.Combine(folder, $"{title}.wav");
-        wavname = $"{title}.wav";
+        mp4file = Path.Combine(folder, $"{mp4filename}.mp4");
+        wavfile = Path.Combine(folder, $"{wavfilename}.wav");
+        wavname = $"{wavfilename}.wav";
 
         File.Delete(mp4file);
         File.Delete(wavfile);
@@ -120,7 +123,6 @@ namespace gene_pool_backend {
       } catch {
         return new string[1];
       }
-
 
       return await TranscriberHelper.TranscribeBinaryReader(new BinaryReader(download.Content));
     }
