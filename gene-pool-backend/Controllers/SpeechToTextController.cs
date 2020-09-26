@@ -12,6 +12,7 @@ using Azure.Storage.Blobs.Models;
 using VideoLibrary;
 using MediaToolkit.Model;
 using NAudio.Utils;
+using Newtonsoft.Json;
 
 namespace gene_pool_backend.Controllers {
   public class MyFile {
@@ -92,42 +93,13 @@ namespace gene_pool_backend.Controllers {
       return Ok();
     }
 
-    /*
-    [HttpPost]
-    [Route("upload_file")]
-    public async Task<IActionResult> UploadFile ([FromForm] MyFile files) {
-      // Create a BlobServiceClient object which will be used to create a container client
-      BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-
-      // Create the container and return a container client object
-      BlobContainerClient containerClient;
-      try {
-        containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
-      } catch {
-        containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-      }
-
-      string fileName = $"{blobFileName}.wav";
-
-      // Get a reference to a blob
-      BlobClient blobClient = containerClient.GetBlobClient(fileName);
-
-      Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
-
-      // Open the file and upload its data
-      using (var stream = files.file.OpenReadStream()) {
-        await blobClient.UploadAsync(stream, true);
-      }
-
-      return Ok();
-    }
-    */
-
     [HttpPost]
     [Route("transcribe_link")]
-    public async Task<IActionResult> LinkToWav([FromForm] MyFile files) {
+    public async Task<IActionResult> LinkToWav(dynamic request) {
+      var body = JsonConvert.DeserializeObject<dynamic>(request.ToString());
+
       try {
-        await BlobStorageHelper.Instance.UploadLinkToBlobAsync("https://www.youtube.com/watch?v=tpIctyqH29Q");
+        await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString());
       } catch {
         return BadRequest("Error during upload");
       }
