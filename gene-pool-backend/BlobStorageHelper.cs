@@ -3,6 +3,7 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.CognitiveServices.Speech;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace gene_pool_backend {
       File.Delete(mp4file);
       File.Delete(wavfile);
 
-      Console.WriteLine("I got here 1");
+      Debug.WriteLine("I got here 1");
 
       FileHelper.SaveVideoToDisk(url, mp4file);
       FileHelper.ToWavFormat(mp4file, wavfile);
@@ -38,22 +39,22 @@ namespace gene_pool_backend {
         containerClient = blobServiceClient.GetBlobContainerClient(containerName);
       }
 
-      Console.WriteLine("I got here 2");
+      Debug.WriteLine("I got here 2");
 
       string fileName = $"hello.wav";
 
       // Get a reference to a blob
       BlobClient blobClient = containerClient.GetBlobClient(fileName);
 
-      Console.WriteLine("I got here 3");
+      Debug.WriteLine("I got here 3");
 
-      Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
+      Debug.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
 
       using FileStream uploadFileStream = File.OpenRead(wavfile);
       await blobClient.UploadAsync(uploadFileStream, true);
       uploadFileStream.Close();
 
-      Console.WriteLine("I got here 4");
+      Debug.WriteLine("I got here 4");
 
       File.Delete(mp4file);
       File.Delete(wavfile);
@@ -74,7 +75,7 @@ namespace gene_pool_backend {
       // Get a reference to a blob
       BlobClient blobClient = containerClient.GetBlobClient(fileName);
 
-      Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
+      Debug.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
 
       // Open the file and upload its data
       using (var stream = file.OpenReadStream()) {
