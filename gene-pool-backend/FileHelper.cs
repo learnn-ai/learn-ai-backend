@@ -14,7 +14,7 @@ namespace gene_pool_backend {
   public static class FileHelper {
     private static string PathToFfmpeg = "ffmpeg.exe";
 
-    public static int ToWavFormat(string pathToMp4, string pathToWav) {
+    public static dynamic ToWavFormat(string pathToMp4, string pathToWav) {
       var ffmpeg = new Process {
         StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = PathToFfmpeg }
       };
@@ -38,7 +38,7 @@ namespace gene_pool_backend {
         }
       } catch (Exception exception) {
         Console.WriteLine(exception.ToString());
-        return -2;
+        return exception.ToString();
       }
 
       ffmpeg.Close();

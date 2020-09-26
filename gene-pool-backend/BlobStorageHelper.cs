@@ -46,9 +46,9 @@ namespace gene_pool_backend {
         Debug.WriteLine("I got here 1");
 
         FileHelper.SaveVideoToDisk(url, mp4file);
-        int res = FileHelper.ToWavFormat(mp4file, wavfile);
+        dynamic res = FileHelper.ToWavFormat(mp4file, wavfile);
 
-        if (res != 0) {
+        if (res.GetType() != typeof(int) || res != 0) {
           return res;
         }
 
