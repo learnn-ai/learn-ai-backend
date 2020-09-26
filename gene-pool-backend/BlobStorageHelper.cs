@@ -18,6 +18,8 @@ namespace gene_pool_backend {
       File.Delete("hello.mp4");
       File.Delete("hello.wav");
 
+      Console.WriteLine("I got here 1");
+
       FileHelper.SaveVideoToDisk(url, "hello.mp4");
       FileHelper.ToWavFormat("hello.mp4", "hello.wav");
 
@@ -29,16 +31,22 @@ namespace gene_pool_backend {
         containerClient = blobServiceClient.GetBlobContainerClient(containerName);
       }
 
+      Console.WriteLine("I got here 2");
+
       string fileName = $"hello.wav";
 
       // Get a reference to a blob
       BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+      Console.WriteLine("I got here 3");
 
       Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
 
       using FileStream uploadFileStream = File.OpenRead("hello.wav");
       await blobClient.UploadAsync(uploadFileStream, true);
       uploadFileStream.Close();
+
+      Console.WriteLine("I got here 4");
 
       File.Delete("hello.mp4");
       File.Delete("hello.wav");
