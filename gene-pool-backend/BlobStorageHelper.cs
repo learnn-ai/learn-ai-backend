@@ -14,14 +14,21 @@ namespace gene_pool_backend {
 
     private static BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
+    private static string mp4file;
+    private static string wavfile;
+
     public static async Task UploadLinkToBlobAsync(string url) {
-      File.Delete("hello.mp4");
-      File.Delete("hello.wav");
+      var folder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+      mp4file = Path.Combine(folder, "hello.mp4");
+      wavfile = Path.Combine(folder, "hello.wav");
+
+      File.Delete(mp4file);
+      File.Delete(wavfile);
 
       Console.WriteLine("I got here 1");
 
-      FileHelper.SaveVideoToDisk(url, "hello.mp4");
-      FileHelper.ToWavFormat("hello.mp4", "hello.wav");
+      FileHelper.SaveVideoToDisk(url, mp4file);
+      FileHelper.ToWavFormat(mp4file, wavfile);
 
       // Create the container and return a container client object
       BlobContainerClient containerClient;
@@ -42,14 +49,14 @@ namespace gene_pool_backend {
 
       Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
 
-      using FileStream uploadFileStream = File.OpenRead("hello.wav");
+      using FileStream uploadFileStream = File.OpenRead(wavfile);
       await blobClient.UploadAsync(uploadFileStream, true);
       uploadFileStream.Close();
 
       Console.WriteLine("I got here 4");
 
-      File.Delete("hello.mp4");
-      File.Delete("hello.wav");
+      File.Delete(mp4file);
+      File.Delete(wavfile);
     }
 
     public static async Task UploadFileToBlobAsync(Microsoft.AspNetCore.Http.IFormFile file) {
