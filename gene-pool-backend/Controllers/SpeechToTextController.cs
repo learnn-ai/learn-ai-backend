@@ -99,9 +99,9 @@ namespace gene_pool_backend.Controllers {
       var body = JsonConvert.DeserializeObject<dynamic>(request.ToString());
 
       try {
-        bool res = await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString());
-        if (!res) {
-          return BadRequest("Error during upload");
+        int res = await BlobStorageHelper.Instance.UploadLinkToBlobAsync(body.url.ToString());
+        if (res != 0) {
+          return BadRequest(res);
         }
       } catch {
         return BadRequest("Error during upload");

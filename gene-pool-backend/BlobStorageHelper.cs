@@ -30,7 +30,7 @@ namespace gene_pool_backend {
     private string wavfile;
     private string wavname;
 
-    public async Task<bool> UploadLinkToBlobAsync(string url) {
+    public async Task<int> UploadLinkToBlobAsync(string url) {
       try {
         string mp4filename = Guid.NewGuid().ToString();
         string wavfilename = Guid.NewGuid().ToString();
@@ -47,7 +47,7 @@ namespace gene_pool_backend {
 
         FileHelper.SaveVideoToDisk(url, mp4file);
         if (!FileHelper.ToWavFormat(mp4file, wavfile)) {
-          return false;
+          return 2;
         }
 
         // Create the container and return a container client object
@@ -67,18 +67,20 @@ namespace gene_pool_backend {
 
         Debug.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
 
-        using FileStream uploadFileStream = File.OpenRead(wavfile);
-        await blobClient.UploadAsync(uploadFileStream, true);
-        uploadFileStream.Close();
-
-        Debug.WriteLine("I got here 4");
+        try {
+          using FileStream uploadFileStream = File.OpenRead(wavfile);
+          await blobClient.UploadAsync(uploadFileStream, true);
+          uploadFileStream.Close();
+        } catch {
+          return 3;
+        }
 
         File.Delete(mp4file);
         File.Delete(wavfile);
 
-        return true;
+        return 0;
       } catch {
-        return false;
+        return 1;
       }
     }
 
