@@ -15,6 +15,8 @@ namespace gene_pool_backend {
     private static string PathToFfmpeg = "ffmpeg.exe";
 
     public static void ToWavFormat(string pathToMp4, string pathToWav) {
+      System.Diagnostics.Trace.TraceInformation("TESTINGTESTINGTESTING");
+
       var ffmpeg = new Process {
         StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = PathToFfmpeg }
       };
