@@ -6,8 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
     <PackageReference Include="MediaToolkit" Version="1.1.0.1" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.13.0" />
+    <PackageReference Include="NAudio" Version="1.10.0" />
+    <PackageReference Include="NReco.VideoConverter" Version="1.1.4" />
     <PackageReference Include="VideoLibrary" Version="3.0.6" />
   </ItemGroup>
 

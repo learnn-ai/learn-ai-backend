@@ -40,8 +40,15 @@ C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backen
 C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\Microsoft.CognitiveServices.Speech.extension.codec.dll
 C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\Microsoft.CognitiveServices.Speech.extension.kws.dll
 C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\Microsoft.CognitiveServices.Speech.extension.silk_codec.dll
-C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.csproj.CoreCompileInputs.cache
-C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.dll
 C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.pdb
 C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.genruntimeconfig.cache
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\NAudio.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\System.Resources.Extensions.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\Azure.Core.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\Azure.Storage.Blobs.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\Azure.Storage.Common.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\bin\Debug\netcoreapp3.1\NReco.VideoConverter.dll
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.csproj.CoreCompileInputs.cache
+C:\Users\justi\OneDrive\Documents\Code\Github\gene-pool-backend\gene-pool-backend\obj\Debug\netcoreapp3.1\gene-pool-backend.MvcApplicationPartsAssemblyInfo.cache

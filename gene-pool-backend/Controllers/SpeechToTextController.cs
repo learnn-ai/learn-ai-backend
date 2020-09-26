@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using MediaToolkit;
-using MediaToolkit.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VideoLibrary;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
-using System.Drawing.Printing;
-using System.Reflection;
 using System.IO;
 using System.Text;
+using NAudio.Wave;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using VideoLibrary;
+using MediaToolkit.Model;
+using NAudio.Utils;
 
 namespace gene_pool_backend.Controllers {
   public class MyFile {
@@ -33,30 +32,18 @@ namespace gene_pool_backend.Controllers {
       var config = SpeechConfig.FromSubscription("0afaff0095f946eaa101f44563f3c341", "eastus2");
       var stopRecognition = new TaskCompletionSource<int>();
 
-      /*
-      byte channels = 1;
-      byte bitsPerSample = 16;
-      int samplesPerSecond = 16000; // or 8000
-      var audioFormat = AudioStreamFormat.GetWaveFormatPCM((uint)samplesPerSecond, bitsPerSample, channels);
-      PushAudioInputStream audioStream = AudioInputStream.CreatePushStream(audioFormat);
-
-      BinaryReader reader = new BinaryReader(files.file.OpenReadStream());
-      audioStream.Write(reader.ReadBytes((int) files.file.Length));
-      audioStream.Close();
-      */
-
       Console.WriteLine(Path.GetFullPath("test.wav"));
 
       StringBuilder sb = new StringBuilder();
 
       // using (var audioConfig = AudioConfig.FromStreamInput(audioStream)) {
-      using (var audioConfig = AudioConfig.FromWavFileInput(Path.GetFullPath("test.wav"))) {
+      using (var audioConfig = AudioConfig.FromWavFileInput(Path.GetFullPath("helloworld.wav"))) {
         using (var recognizer = new SpeechRecognizer(config, audioConfig)) {
           // Subscribes to events.
           recognizer.Recognized += (s, e) =>
           {
             if (e.Result.Reason == ResultReason.RecognizedSpeech) {
-              // Console.WriteLine($"RECOGNIZED: Text={e.Result.Text}");
+              Console.WriteLine($"RECOGNIZED: Text={e.Result.Text}");
               sb.Append(e.Result.Text);
             } else if (e.Result.Reason == ResultReason.NoMatch) {
               Console.WriteLine($"NOMATCH: Speech could not be recognized.");
@@ -105,28 +92,82 @@ namespace gene_pool_backend.Controllers {
       return Ok();
     }
 
-    [HttpPost]
-    [Route("byte_file_transcribe")]
-    public async Task<IActionResult> ByteFileTranscribe([FromForm] MyFile files) {
-      Console.WriteLine(files);
-      Console.WriteLine(files.test);
-      Console.WriteLine(files.file);
+    string connectionString = "DefaultEndpointsProtocol=https;AccountName=genepoolstorage;AccountKey=gYC3jnsvdZCSxQJH4hTn2kpy9SyDW5bpfB5KIjB7D0SPMu0GG7y/mlrJNFrAGi56kadHW+VDwsxoYKvb3eaCAw==;EndpointSuffix=core.windows.net";
+    string containerName = "genepoolcontainer";
+    string blobFileName = "helloworld";
 
+    [HttpPost]
+    [Route("upload_file")]
+    public async Task<IActionResult> UploadFile ([FromForm] MyFile files) {
+      // Create a BlobServiceClient object which will be used to create a container client
+      BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+
+      // Create the container and return a container client object
+      BlobContainerClient containerClient;
+      try {
+        containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+      } catch {
+        containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+      }
+
+      string fileName = $"{blobFileName}.wav";
+
+      // Get a reference to a blob
+      BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+      Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
+
+      // Open the file and upload its data
+      using (var stream = files.file.OpenReadStream()) {
+        await blobClient.UploadAsync(stream, true);
+      }
+
+      return Ok();
+    }
+
+    [HttpPost]
+    [Route("link_to_wav")]
+    public async Task<IActionResult> LinkToWav([FromForm] MyFile files) {
+      FileHelpers.SaveVideoToDisk("https://www.youtube.com/watch?v=tpIctyqH29Q");
+      FileHelpers.ToWavFormat("hello.mp4", "hello.wav");
+
+      return Ok();
+    }
+
+     [HttpPost]
+    [Route("blob_to_text")]
+    public async Task<IActionResult> BlobToText([FromForm] MyFile files) {
       var config = SpeechConfig.FromSubscription("0afaff0095f946eaa101f44563f3c341", "eastus2");
+
       var stopRecognition = new TaskCompletionSource<int>();
 
-      Console.WriteLine(Path.GetFullPath("test.wav"));
+      // Create a BlobServiceClient object which will be used to create a container client
+      BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
-      StringBuilder sb = new StringBuilder();
+      // Create the container and return a container client object
+      BlobContainerClient containerClient;
+      try {
+        containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+      } catch {
+        containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+      }
 
-      // using (var audioConfig = AudioConfig.FromStreamInput(audioStream)) {
-      using (var audioConfig = AudioConfig.FromWavFileInput(Path.GetFullPath("test.wav"))) {
-        using (var recognizer = new SpeechRecognizer(config, audioConfig)) {
+      BlobClient blobClient = containerClient.GetBlobClient($"{blobFileName}.wav");
+      BlobDownloadInfo download = await blobClient.DownloadAsync();
+
+      // Create an audio stream from a wav file.
+      // Replace with your own audio file name.
+      using (var audioInput = Utility.OpenWavFile(new BinaryReader(download.Content))) {
+        // Creates a speech recognizer using audio stream input.
+        using (var recognizer = new SpeechRecognizer(config, audioInput)) {
           // Subscribes to events.
+          recognizer.Recognizing += (s, e) => {
+            Console.WriteLine($"RECOGNIZING: Text={e.Result.Text}");
+          };
+
           recognizer.Recognized += (s, e) => {
             if (e.Result.Reason == ResultReason.RecognizedSpeech) {
-              // Console.WriteLine($"RECOGNIZED: Text={e.Result.Text}");
-              sb.Append(e.Result.Text);
+              Console.WriteLine($"RECOGNIZED: Text={e.Result.Text}");
             } else if (e.Result.Reason == ResultReason.NoMatch) {
               Console.WriteLine($"NOMATCH: Speech could not be recognized.");
             }
@@ -145,11 +186,11 @@ namespace gene_pool_backend.Controllers {
           };
 
           recognizer.SessionStarted += (s, e) => {
-            Console.WriteLine("\n    Session started event.");
+            Console.WriteLine("\nSession started event.");
           };
 
           recognizer.SessionStopped += (s, e) => {
-            Console.WriteLine("\n    Session stopped event.");
+            Console.WriteLine("\nSession stopped event.");
             Console.WriteLine("\nStop recognition.");
             stopRecognition.TrySetResult(0);
           };
@@ -165,8 +206,6 @@ namespace gene_pool_backend.Controllers {
           await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
         }
       }
-
-      Console.WriteLine(sb.ToString());
 
       return Ok();
     }
