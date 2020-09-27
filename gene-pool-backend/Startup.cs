@@ -15,6 +15,7 @@ namespace gene_pool_backend {
   public class Startup {
     public Startup(IConfiguration configuration) {
       Configuration = configuration;
+      BlobStorageHelper.Init(configuration);
     }
 
     public IConfiguration Configuration { get; }
