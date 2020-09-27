@@ -117,5 +117,13 @@ namespace gene_pool_backend.Controllers {
         return BadRequest("Unknown error during transcription");
       }
     }
+
+    [HttpPost]
+    [Route("debug_find_file")]
+    public async Task<IActionResult> FindFile(dynamic request) {
+      var body = JsonConvert.DeserializeObject<dynamic>(request.ToString());
+
+      return Ok(FileHelper.FindFile("ffmpeg.exe"));
+    }
   }
 }

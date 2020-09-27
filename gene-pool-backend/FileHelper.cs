@@ -12,11 +12,50 @@ using VideoLibrary;
 
 namespace gene_pool_backend {
   public static class FileHelper {
-    private static string PathToFfmpeg = "ffmpeg.exe";
+    private static readonly string ffmpegName = "ffmpeg.exe";
+
+    private static string ProcessDirectory(string targetDirectory, string fileName) {
+      string path = "";
+
+      // Process the list of files found in the directory.
+      string[] fileEntries = Directory.GetFiles(targetDirectory);
+      foreach (string filePath in fileEntries) {
+        if (Path.GetFileName(filePath).Equals(fileName)) {
+          return filePath;
+        }
+      }
+
+      // Recurse into subdirectories of this directory.
+      string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+      foreach (string subdirectory in subdirectoryEntries) {
+        path = ProcessDirectory(subdirectory, fileName);
+        if (path.Length > 0) {
+          return path;
+        }
+      }
+
+      return path;
+    }
+
+    public static string FindFile(string fileName) {
+      string path = Directory.GetCurrentDirectory();
+      Console.WriteLine(path);
+
+      path = ProcessDirectory(path, fileName);
+
+      if (path.Length > 0) {
+        Console.WriteLine($"Found exe: {path}");
+      } else {
+        Console.WriteLine("Did not find path");
+      }
+
+      return path;
+    }
 
     public static dynamic ToWavFormat(string pathToMp4, string pathToWav) {
+      string path = FindFile(ffmpegName);
       var ffmpeg = new Process {
-        StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = PathToFfmpeg }
+        StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = path }
       };
 
       var arguments =
