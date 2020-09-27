@@ -52,10 +52,10 @@ namespace gene_pool_backend {
       return path;
     }
 
-    public static dynamic ToWavFormat(string pathToMp4, string pathToWav) {
-      string path = FindFile(ffmpegName);
+    public static dynamic ToWavFormat(string pathToMp4, string pathToWav, string pathToFfmpeg) {
+      // string path = FindFile(ffmpegName);
       var ffmpeg = new Process {
-        StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = path }
+        StartInfo = { UseShellExecute = false, RedirectStandardError = true, FileName = pathToFfmpeg }
       };
 
       var arguments =

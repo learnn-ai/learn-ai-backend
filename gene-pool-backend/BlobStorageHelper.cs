@@ -43,10 +43,12 @@ namespace gene_pool_backend {
         File.Delete(mp4file);
         File.Delete(wavfile);
 
+        string ffmpegPath = await DownloadFile("ffmpeg.exe");
+
         Debug.WriteLine("I got here 1");
 
         FileHelper.SaveVideoToDisk(url, mp4file);
-        dynamic res = FileHelper.ToWavFormat(mp4file, wavfile);
+        dynamic res = FileHelper.ToWavFormat(mp4file, wavfile, ffmpegPath);
 
         if (res.GetType() != typeof(int) || res != 0) {
           return res;
@@ -129,6 +131,28 @@ namespace gene_pool_backend {
       }
 
       return await TranscriberHelper.TranscribeBinaryReader(new BinaryReader(download.Content));
+    }
+
+    public async Task<string> DownloadFile(string fileName) {
+      // Create the container and return a container client object
+      BlobContainerClient containerClient;
+      try {
+        containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+      } catch {
+        containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+      }
+
+      BlobClient blobClient = containerClient.GetBlobClient(fileName);
+      BlobDownloadInfo download = await blobClient.DownloadAsync();
+      string downloadFilePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+      string ffmpegPath = Path.Combine(downloadFilePath, fileName);
+
+      using (FileStream downloadFileStream = File.OpenWrite(ffmpegPath)) {
+        await download.Content.CopyToAsync(downloadFileStream);
+        downloadFileStream.Close();
+      }
+
+      return ffmpegPath;
     }
   }
 }
